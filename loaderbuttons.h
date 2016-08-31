@@ -8,6 +8,9 @@ public:
     LoaderButtons();
     LoaderButtons(QString _button_name, QString _target_name);
     void loadData();
+
+private:
+
 };
 
 #endif // LOADERBUTTONS_H

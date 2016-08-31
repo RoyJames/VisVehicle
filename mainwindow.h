@@ -7,6 +7,7 @@
 #include <vector>
 #include <QStackedWidget>
 #include <QWidget>
+#include <QTableView>
 
 #include "buttons.h"
 #include "loaderbuttons.h"
@@ -28,15 +29,15 @@ public:
     void linkEngine();
 
 private slots:
-    void on_pushButton_clicked();
+    void on_pushButton_load_clicked();
 
-    void on_pushButton_3_clicked();
+    void on_pushButton_condition_clicked();
 
-    void on_pushButton_2_clicked();
+    void on_pushButton_simulate_clicked();
 
 private:
     Ui::MainWindow *ui;
-    QVBoxLayout *layout;
+    QVBoxLayout *loaderbuttons_layout;
 
     Engine *matEngine;
 
@@ -46,6 +47,9 @@ private:
     QWidget *step_loadfiles;
     QWidget *step_conditions;
     QWidget *step_simulation;
+    QTableView *general_table;
+    QTableView *wheel_table;
+
     //DataManager vehicle_data;
 };
 
