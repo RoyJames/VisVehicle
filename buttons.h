@@ -3,14 +3,14 @@
 
 #include <QString>
 
+
 class Buttons
 {
 public:
     Buttons();
-    Buttons(QString _button_name, QString _target_name);
+    Buttons(QString _disp_name);
 private:
-    QString button_name;
-    QString target_name;
+    QString disp_name;
 };
 
 #endif // BUTTONS_H

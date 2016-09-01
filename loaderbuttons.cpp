@@ -7,12 +7,12 @@ LoaderButtons::LoaderButtons()
 
 }
 
-LoaderButtons::LoaderButtons(QString _button_name, QString _target_name):Buttons(_button_name, _target_name)
+LoaderButtons::LoaderButtons(QString _disp_name):Buttons(_disp_name)
 {
-
+    table_name = DEFAULT_VEHICLE_DATABASE;
 }
 
-void LoaderButtons::loadData()
+void LoaderButtons::loadTable()
 {
 
 }

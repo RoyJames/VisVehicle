@@ -40,9 +40,9 @@ MainWindow::MainWindow(QWidget *parent) :
     model->setEditStrategy(QSqlTableModel::OnFieldChange);
     model->select();
 
-    model->setHeaderData(0, Qt::Horizontal, tr("Contents"));
-    model->setHeaderData(1, Qt::Horizontal, tr("Unit"));
-    model->setHeaderData(2, Qt::Horizontal, tr("Number"));
+    //model->setHeaderData(0, Qt::Horizontal, tr("Contents"));
+    //model->setHeaderData(1, Qt::Horizontal, tr("Unit"));
+    //model->setHeaderData(2, Qt::Horizontal, tr("Number"));
 
     general_table->setModel(model);
     general_table->resizeColumnsToContents();
