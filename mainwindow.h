@@ -8,6 +8,7 @@
 #include <QStackedWidget>
 #include <QWidget>
 #include <QTableView>
+#include <QButtonGroup>
 
 #include "buttons.h"
 #include "loaderbuttons.h"
@@ -34,6 +35,7 @@ private slots:
     void on_pushButton_condition_clicked();
 
     void on_pushButton_simulate_clicked();
+    void onGroupButtonClicked(int);
 
 private:
     Ui::MainWindow *ui;
@@ -41,8 +43,8 @@ private:
 
     Engine *matEngine;
 
-    std::vector<LoaderButtons> loader_buttons;
-    std::vector<Buttons> plot_buttons;
+    std::vector<LoaderButtons*> loader_buttons;
+    QButtonGroup *loader_buttons_group;
     QStackedWidget *task_stacks;
     QWidget *step_loadfiles;
     QWidget *step_conditions;

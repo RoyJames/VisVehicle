@@ -7,6 +7,8 @@
 #include <QPushButton>
 #include <vector>
 #include <QSqlTableModel>
+#include <QFile>
+#include <QButtonGroup>
 #include "connection.h"
 
 #include "loaderbuttons.h"
@@ -26,7 +28,6 @@ MainWindow::MainWindow(QWidget *parent) :
     step_simulation = ui->page_simulation;
     general_table = ui->tableView_generaldata;
     addLoadButtons();
-
     //linkEngine();
 
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
@@ -58,23 +59,28 @@ MainWindow::~MainWindow()
 
 void MainWindow::addLoadButtons()
 {
-    QPushButton *button_loadSummary = new QPushButton("Edit Summary Sheet");
-    loaderbuttons_layout->addWidget(button_loadSummary);
+    QFile button_list(":/new/lists/load_buttons_list");
+    if(!button_list.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        qDebug() << "Open failed.";
+        return;
+    }
 
-    QPushButton *button_loadINFO = new QPushButton("Edit Vehicle INFO");
-    loaderbuttons_layout->addWidget(button_loadINFO);
+    QTextStream txtInput(&button_list);
+    QString lineStr;
 
-    QPushButton *button_loadParameters = new QPushButton("Edit Vehicle Parameters");
-    loaderbuttons_layout->addWidget(button_loadParameters);
-
-    QPushButton *button_loadSuspension = new QPushButton("Edit Suspension Parameters");
-    loaderbuttons_layout->addWidget(button_loadSuspension);
-
-    QPushButton *button_loadDamper = new QPushButton("Edit Damper (optional)");
-    loaderbuttons_layout->addWidget(button_loadDamper);
-
-    QPushButton *button_loadSpring = new QPushButton("Edit Spring (optional)");
-    loaderbuttons_layout->addWidget(button_loadSpring);
+    loader_buttons_group = new QButtonGroup;
+    int buttons_cnt = 0;
+    while(!txtInput.atEnd())
+    {
+        lineStr = txtInput.readLine();
+        QPushButton *new_button = new QPushButton(lineStr);
+        loader_buttons_group->addButton(new_button, ++buttons_cnt);
+        loaderbuttons_layout->addWidget(new_button);
+        loader_buttons.push_back(new LoaderButtons(lineStr, "unknown table name"));
+    }
+    connect(loader_buttons_group, SIGNAL(buttonClicked(int)), this, SLOT(onGroupButtonClicked(int)));
+    button_list.close();
 }
 
 void MainWindow::linkEngine()
@@ -98,4 +104,9 @@ void MainWindow::on_pushButton_condition_clicked()
 void MainWindow::on_pushButton_simulate_clicked()
 {
     task_stacks->setCurrentWidget(step_simulation);
+}
+
+void MainWindow::onGroupButtonClicked(int id)
+{
+    qDebug() << id;
 }

@@ -6,5 +6,6 @@
 #define LIST_DATA   4
 
 #define DEFAULT_VEHICLE_DATABASE  "default.db"
+#define READ_BUTTON_LIST_PATH "D:\\codes\\qt\\VisVehicle\\load_buttons_list"
 
 #endif // DEFINITIONS_H
