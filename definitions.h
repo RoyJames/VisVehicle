@@ -5,7 +5,14 @@
 #define WHEEL_DATA  2
 #define LIST_DATA   4
 
-#define DEFAULT_VEHICLE_DATABASE  "default.db"
+#define DEFAULT_VEHICLE_DATABASE  "D:/VisVehicle/defaultvehicles.db"
 #define READ_BUTTON_LIST_PATH "D:\\codes\\qt\\VisVehicle\\load_buttons_list"
+
+
+enum DATATABLETYPE{
+    GENERAL_TYPE = 1,
+    WHEEL_TYPE = 2,
+    LIST_TYPE = 4
+};
 
 #endif // DEFINITIONS_H

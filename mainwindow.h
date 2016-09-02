@@ -28,6 +28,7 @@ public:
     ~MainWindow();
     void addLoadButtons();
     void linkEngine();
+    void setDisplayTable(int button_id);
 
 private slots:
     void on_pushButton_load_clicked();
@@ -35,6 +36,7 @@ private slots:
     void on_pushButton_condition_clicked();
 
     void on_pushButton_simulate_clicked();
+
     void onGroupButtonClicked(int);
 
 private:
@@ -51,6 +53,7 @@ private:
     QWidget *step_simulation;
     QTableView *general_table;
     QTableView *wheel_table;
+    QTableView *list_table;
 
     //DataManager vehicle_data;
 };

@@ -8,13 +8,15 @@ class LoaderButtons : public Buttons
 {
 public:
     LoaderButtons();
-    LoaderButtons(QString _disp_name, QString _table_name);
+    LoaderButtons(QString _disp_name, QString _table_name, short _flag);
     void loadTable();
-
+    QString getTableName();
+    QString getDatabaseName();
+    short getDataFlag();
 private:
     QString database_name;
     QString table_name;
-    char data_contained_flag;
+    short data_contained_flag;
 };
 
 #endif // LOADERBUTTONS_H
