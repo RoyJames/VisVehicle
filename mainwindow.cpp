@@ -62,6 +62,7 @@ void MainWindow::addLoadButtons()
         lineStr = txtInput.readLine();
         QStringList fields = lineStr.split(',');
         QPushButton *new_button = new QPushButton(fields.takeFirst());
+        new_button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         loader_buttons_group->addButton(new_button, ++buttons_cnt);
         loaderbuttons_layout->addWidget(new_button);
         loader_buttons.push_back(new LoaderButtons(lineStr, fields.takeFirst(), fields.takeLast().toInt()));
@@ -95,7 +96,7 @@ void MainWindow::on_pushButton_simulate_clicked()
 
 void MainWindow::onGroupButtonClicked(int id)
 {
-    qDebug() << "Clicked button is:" << id << " " << loader_buttons[id-1]->getTableName() << " " << loader_buttons[id-1]->getDataFlag();
+    //qDebug() << "Clicked button is:" << id << " " << loader_buttons[id-1]->getTableName() << " " << loader_buttons[id-1]->getDataFlag();
     setDisplayTable(id);
 }
 
@@ -106,11 +107,23 @@ void MainWindow::setDisplayTable(int button_id)
     LoaderButtons *currentLoader = loader_buttons[button_id - 1];
     db.setDatabaseName(currentLoader->getDatabaseName());
     if (!db.open()) return;
-    qDebug() << "connection succeeded";
+    //qDebug() << "connection succeeded";
 
-    if (general_table != NULL) delete general_table;
-    if (wheel_table != NULL) delete wheel_table;
-    if (list_table != NULL) delete list_table;
+    if (general_table != NULL)
+    {
+        delete general_table;
+        general_table = NULL;
+    }
+    if (wheel_table != NULL)
+    {
+        delete wheel_table;
+        wheel_table = NULL;
+    }
+    if (list_table != NULL)
+    {
+        delete list_table;
+        list_table = NULL;
+    }
 
     if (currentLoader->getDataFlag() & WHEEL_TYPE)
     {
@@ -119,18 +132,18 @@ void MainWindow::setDisplayTable(int button_id)
         wheel_model->setTable(currentLoader->getTableName());
         wheel_model->setEditStrategy(QSqlTableModel::OnManualSubmit);
         wheel_model->setFilter("flag = \"WHEEL\"");
-        qDebug() << wheel_model->select();
-
+        wheel_model->select();
         wheel_table = new QTableView;
         ui->verticalLayout_display->insertWidget(0, wheel_table);
         wheel_table->setModel(wheel_model);
         wheel_table->hideColumn(wheel_model->fieldIndex("Number"));
         wheel_table->hideColumn(wheel_model->fieldIndex("flag"));
         wheel_table->resizeColumnsToContents();
+        wheel_table->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
         wheel_table->setAlternatingRowColors(true);
         wheel_table->setStyleSheet("alternate-background-color: gray");
-        connect(ui->pushButton_confirm, SIGNAL(clicked()), wheel_table, SLOT(submitAll()));
-        connect(ui->pushButton_undo, SIGNAL(clicked()), wheel_table, SLOT(revertAll()));
+        connect(ui->pushButton_confirm, SIGNAL(clicked()), wheel_model, SLOT(submitAll()));
+        connect(ui->pushButton_undo, SIGNAL(clicked()), wheel_model, SLOT(revertAll()));
     }
 
     if (currentLoader->getDataFlag() & GENERAL_TYPE)
@@ -140,7 +153,7 @@ void MainWindow::setDisplayTable(int button_id)
         general_model->setTable(currentLoader->getTableName());
         general_model->setEditStrategy(QSqlTableModel::OnManualSubmit);
         general_model->setFilter("flag = \"GENERAL\"");
-        qDebug() << general_model->select();
+        general_model->select();
 
         general_table = new QTableView;
         ui->verticalLayout_display->insertWidget(0, general_table);
@@ -151,6 +164,7 @@ void MainWindow::setDisplayTable(int button_id)
         general_table->hideColumn(general_model->fieldIndex("RR"));
         general_table->hideColumn(general_model->fieldIndex("flag"));
         general_table->resizeColumnsToContents();
+        general_table->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
         general_table->setAlternatingRowColors(true);
         general_table->setStyleSheet("alternate-background-color: gray");
         connect(ui->pushButton_confirm, SIGNAL(clicked()), general_model, SLOT(submitAll()));
@@ -164,13 +178,13 @@ void MainWindow::setDisplayTable(int button_id)
         list_model->setTable(currentLoader->getTableName());
         list_model->setEditStrategy(QSqlTableModel::OnManualSubmit);
         list_model->setFilter("flag = \"LIST\"");
-        qDebug() << list_model->select();
+        list_model->select();
 
         list_table = new QTableView;
         ui->verticalLayout_display->insertWidget(0, list_table);
         list_table->setModel(list_model);
         list_table->hideColumn(list_model->fieldIndex("flag"));
-        list_table->resizeColumnsToContents();
+        list_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
         list_table->setAlternatingRowColors(true);
         list_table->setStyleSheet("alternate-background-color: gray");
         connect(ui->pushButton_confirm, SIGNAL(clicked()), list_model, SLOT(submitAll()));
