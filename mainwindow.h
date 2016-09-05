@@ -12,8 +12,9 @@
 
 #include "buttons.h"
 #include "loaderbuttons.h"
-#include "datamanager.h"
 #include "engine.h"
+#include "testcategory.h"
+
 
 namespace Ui {
 class MainWindow;
@@ -27,6 +28,7 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
     void addLoadButtons();
+    void addTestButtons();
     void linkEngine();
     void setDisplayTable(int button_id);
 
@@ -46,6 +48,7 @@ private:
     Engine *matEngine;
 
     std::vector<LoaderButtons*> loader_buttons;
+    std::vector<TestCategory*> main_categories;
     QButtonGroup *loader_buttons_group;
     QStackedWidget *task_stacks;
     QWidget *step_loadfiles;

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1158</width>
-    <height>691</height>
+    <width>820</width>
+    <height>472</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -135,7 +135,7 @@
          </sizepolicy>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="page_load">
          <property name="sizePolicy">
@@ -221,8 +221,6 @@
                   </layout>
                  </item>
                 </layout>
-                <zorder>verticalLayoutWidget</zorder>
-                <zorder>line</zorder>
                </widget>
               </item>
               <item>
@@ -314,31 +312,24 @@
            <verstretch>1</verstretch>
           </sizepolicy>
          </property>
-         <widget class="QLabel" name="label_2">
+         <widget class="QWidget" name="horizontalLayoutWidget">
           <property name="geometry">
            <rect>
-            <x>10</x>
-            <y>10</y>
-            <width>91</width>
-            <height>16</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>Test Mode</string>
-          </property>
-         </widget>
-         <widget class="Line" name="line_3">
-          <property name="geometry">
-           <rect>
-            <x>520</x>
+            <x>0</x>
             <y>0</y>
-            <width>20</width>
+            <width>791</width>
             <height>371</height>
            </rect>
           </property>
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_test">
+           <item>
+            <widget class="Line" name="line_3">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </widget>
         </widget>
         <widget class="QWidget" name="page_simulation">
@@ -354,11 +345,6 @@
      </layout>
     </item>
    </layout>
-   <zorder>stackedWidget</zorder>
-   <zorder>horizontalLayoutWidget</zorder>
-   <zorder>line</zorder>
-   <zorder>verticalLayoutWidget_2</zorder>
-   <zorder>horizontalLayoutWidget_2</zorder>
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>

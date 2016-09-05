@@ -12,8 +12,8 @@
 #include "connection.h"
 
 #include "loaderbuttons.h"
-#include "datamanager.h"
 #include "buttons.h"
+#include "glwidget.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -33,7 +33,9 @@ MainWindow::MainWindow(QWidget *parent) :
     list_table = NULL;
     setDisplayTable(1);
 
+    addTestButtons();
 
+    //ui->horizontalLayout_test->addWidget(new GLWidget(this));
     //linkEngine();
 
 }
@@ -69,6 +71,67 @@ void MainWindow::addLoadButtons()
     }
     connect(loader_buttons_group, SIGNAL(buttonClicked(int)), this, SLOT(onGroupButtonClicked(int)));
     button_list.close();
+}
+
+void MainWindow::addTestButtons()
+{
+    QFile button_list(":/new/lists/test_category_list");
+    if(!button_list.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        qDebug() << "Open failed.";
+        return;
+    }
+
+    QTextStream txtInput(&button_list);
+    QString lineStr;
+    while(!txtInput.atEnd())
+    {
+        lineStr = txtInput.readLine();
+        QStringList fields = lineStr.split(',');
+        TestCategory *newCategory = new TestCategory(fields.takeFirst());
+        int n_subcats = fields.takeFirst().toInt();
+        while(n_subcats--)
+        {
+            TestSubcategory *newSubcategory = new TestSubcategory();
+            QString sublineStr;
+            sublineStr = txtInput.readLine();
+            QStringList subfields = sublineStr.split(',');
+
+            // Read subcategory name and descriptions
+            newSubcategory->SubcategoryName = subfields.takeFirst();
+            //int n_short = subfields.takeFirst().toInt();
+            newSubcategory->ShortDescriptions = subfields.takeFirst();
+            newSubcategory->FullDescriptions = txtInput.readLine();
+
+            // Read function name and database path
+            sublineStr = txtInput.readLine();
+            subfields = sublineStr.split(',');
+            newSubcategory->FunctionName = subfields.takeFirst();
+            newSubcategory->DatabasePath = subfields.takeFirst();
+
+            // Read graph database names
+            sublineStr = txtInput.readLine();
+            subfields = sublineStr.split(',');
+            int n_graph = subfields.takeFirst().toInt();
+            while (n_graph--)
+            {
+                newSubcategory->ResGraphNames.push_back(subfields.takeFirst());
+            }
+            // Read table database name
+            sublineStr = txtInput.readLine();
+            subfields = sublineStr.split(',');
+            int n_table = subfields.takeFirst().toInt();
+            while (n_table--)
+            {
+                newSubcategory->ResTableNames.push_back(subfields.takeFirst());
+            }
+
+            // Finish reading this subcategory
+            newCategory->subcats.push_back(newSubcategory);
+        }
+        // Finish reading this main category
+        main_categories.push_back(newCategory);
+    }
 }
 
 void MainWindow::linkEngine()

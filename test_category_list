@@ -1,0 +1,12 @@
+RIDE,1
+High speed way,Basic ride\nChoppy ride\nPitch/Roll
+This test mode will test the ability of the vehicle driving on high speed ways.
+high_speed_way,high_speed_way.db
+2,UG_lateral,SA_lateral
+1,LF_Passat
+HANDLING,1
+SSC,US / OS\nLinearity\nLateral grip
+This test mode will test SSC properties of the vehicle.
+SSC,SSC.db
+0
+0

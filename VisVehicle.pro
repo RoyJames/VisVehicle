@@ -6,6 +6,8 @@
 
 QT       += core gui
 QT       += webkitwidgets
+QT       += sql
+QT       += widgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -17,12 +19,17 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     buttons.cpp \
     loaderbuttons.cpp \
-    datamanager.cpp
+    glwidget.cpp \
+    testcategory.cpp \
+    testsubcategory.cpp
 
 HEADERS  += mainwindow.h \
     buttons.h \
     loaderbuttons.h \
-    datamanager.h
+    glwidget.h \
+    testcategory.h \
+    testsubcategory.h \
+    definitions.h
 
 INCLUDEPATH += $$quote(E:\matlab32bit\extern\include)
 
@@ -30,3 +37,6 @@ LIBS += -L$$quote(E:\matlab32bit\extern\lib\win32\microsoft) -llibeng -llibmat -
 
 
 FORMS    += mainwindow.ui
+
+RESOURCES += \
+    res.qrc

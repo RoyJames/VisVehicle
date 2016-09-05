@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/new/lists">
         <file>load_buttons_list</file>
+        <file>test_category_list</file>
     </qresource>
 </RCC>
