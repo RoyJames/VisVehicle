@@ -2,5 +2,6 @@
     <qresource prefix="/new/lists">
         <file>load_buttons_list</file>
         <file>test_category_list</file>
+        <file>defaultvehicles.db</file>
     </qresource>
 </RCC>

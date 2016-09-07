@@ -36,7 +36,7 @@ MainWindow::MainWindow(QWidget *parent) :
     addTestButtons();
 
     //ui->horizontalLayout_test->addWidget(new GLWidget(this));
-    //linkEngine();
+    linkEngine();
 
 }
 
@@ -47,7 +47,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::addLoadButtons()
 {
-    QFile button_list(":/new/lists/load_buttons_list");
+    QFile button_list(READ_BUTTON_LIST_PATH);
     if(!button_list.open(QIODevice::ReadOnly | QIODevice::Text))
     {
         qDebug() << "Open failed.";
@@ -138,7 +138,15 @@ void MainWindow::linkEngine()
 {
     qDebug() << "Prepare to load engine" << endl;
     matEngine = engOpen(NULL);
+    engSetVisible(matEngine, FALSE);
     qDebug() << "Engine loaded successfully" << endl;
+    /*
+    char buffer[1000];
+    buffer[999] = '\0';
+    engOutputBuffer(matEngine, buffer, 1000);
+    engEvalString(matEngine, "rand(1,10)");
+    qDebug() << buffer;
+    */
 }
 
 void MainWindow::on_pushButton_load_clicked()
@@ -195,7 +203,7 @@ void MainWindow::setDisplayTable(int button_id)
         wheel_model->setTable(currentLoader->getTableName());
         wheel_model->setEditStrategy(QSqlTableModel::OnManualSubmit);
         wheel_model->setFilter("flag = \"WHEEL\"");
-        wheel_model->select();
+        if (!wheel_model->select()) return;
         wheel_table = new QTableView;
         ui->verticalLayout_display->insertWidget(0, wheel_table);
         wheel_table->setModel(wheel_model);
@@ -216,7 +224,7 @@ void MainWindow::setDisplayTable(int button_id)
         general_model->setTable(currentLoader->getTableName());
         general_model->setEditStrategy(QSqlTableModel::OnManualSubmit);
         general_model->setFilter("flag = \"GENERAL\"");
-        general_model->select();
+        if (!general_model->select()) return;
 
         general_table = new QTableView;
         ui->verticalLayout_display->insertWidget(0, general_table);
@@ -241,7 +249,7 @@ void MainWindow::setDisplayTable(int button_id)
         list_model->setTable(currentLoader->getTableName());
         list_model->setEditStrategy(QSqlTableModel::OnManualSubmit);
         list_model->setFilter("flag = \"LIST\"");
-        list_model->select();
+        if (!list_model->select()) return;
 
         list_table = new QTableView;
         ui->verticalLayout_display->insertWidget(0, list_table);

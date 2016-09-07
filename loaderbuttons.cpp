@@ -31,3 +31,8 @@ short LoaderButtons::getDataFlag()
 {
     return data_contained_flag;
 }
+
+void LoaderButtons::setDatabaseName(QString newname)
+{
+    database_name = newname;
+}

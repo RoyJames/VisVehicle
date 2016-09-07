@@ -13,6 +13,7 @@ public:
     QString getTableName();
     QString getDatabaseName();
     short getDataFlag();
+    void setDatabaseName(QString newname);
 private:
     QString database_name;
     QString table_name;
