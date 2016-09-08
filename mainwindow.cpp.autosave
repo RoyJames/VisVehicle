@@ -159,7 +159,7 @@ void MainWindow::linkEngine()
     engPutVariable(matEngine, "mycell", cell_array_ptr);
     */
 
-
+    
     mxArray *buffer;
     engEvalString(matEngine, "teststr=cell(2,1); teststr{1}=['winter',char(9),' is',char(9), 'coming']; teststr{2}=['winter',char(9),'is',char(9),'not',char(9), 'coming']");
     buffer = mxGetCell(engGetVariable(matEngine, "teststr"), 0);
