@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>820</width>
-    <height>472</height>
+    <width>868</width>
+    <height>509</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -19,6 +19,9 @@
   <property name="windowTitle">
    <string>VisVehicle</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
   <widget class="QWidget" name="centralWidget">
    <property name="sizePolicy">
     <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -29,6 +32,9 @@
    <layout class="QGridLayout" name="gridLayout" rowstretch="0" columnstretch="0">
     <property name="sizeConstraint">
      <enum>QLayout::SetMaximumSize</enum>
+    </property>
+    <property name="bottomMargin">
+     <number>50</number>
     </property>
     <item row="0" column="0">
      <layout class="QVBoxLayout" name="verticalLayout_4" stretch="7,1,50">
@@ -57,6 +63,9 @@
           <property name="text">
            <string>Vehicle</string>
           </property>
+          <property name="checkable">
+           <bool>false</bool>
+          </property>
          </widget>
         </item>
         <item>
@@ -83,6 +92,9 @@
           <property name="text">
            <string>Test</string>
           </property>
+          <property name="checkable">
+           <bool>false</bool>
+          </property>
          </widget>
         </item>
         <item>
@@ -108,6 +120,9 @@
           </property>
           <property name="text">
            <string>Analysis</string>
+          </property>
+          <property name="checkable">
+           <bool>false</bool>
           </property>
          </widget>
         </item>
@@ -312,22 +327,105 @@
            <verstretch>1</verstretch>
           </sizepolicy>
          </property>
-         <widget class="QWidget" name="horizontalLayoutWidget">
+         <widget class="QWidget" name="">
           <property name="geometry">
            <rect>
-            <x>0</x>
-            <y>0</y>
-            <width>791</width>
-            <height>371</height>
+            <x>10</x>
+            <y>10</y>
+            <width>831</width>
+            <height>321</height>
            </rect>
           </property>
-          <layout class="QHBoxLayout" name="horizontalLayout_test">
+          <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="4,10,5">
            <item>
-            <widget class="Line" name="line_3">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
+            <layout class="QVBoxLayout" name="verticalLayout_vehiclelist">
+             <item>
+              <widget class="QLabel" name="label_2">
+               <property name="text">
+                <string>Vehicle</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="pushButton_loadvehicledata">
+               <property name="text">
+                <string>Load More
+ Vehicle Data</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QListWidget" name="listWidget_vehiclelist"/>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_testcategory">
+             <property name="sizeConstraint">
+              <enum>QLayout::SetMinimumSize</enum>
              </property>
-            </widget>
+            </layout>
+           </item>
+           <item>
+            <layout class="QVBoxLayout" name="verticalLayout_descriptions" stretch="0,0">
+             <item>
+              <widget class="QGroupBox" name="groupBox_2">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="title">
+                <string>Detailed description</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_3">
+                <item>
+                 <widget class="QLabel" name="label_detaildescription">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="text">
+                   <string>descriptions</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+                  </property>
+                  <property name="wordWrap">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
+             <item>
+              <widget class="QGroupBox" name="groupBox">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="title">
+                <string>Test condition / Parameters</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+               <layout class="QVBoxLayout" name="verticalLayout"/>
+              </widget>
+             </item>
+            </layout>
            </item>
           </layout>
          </widget>

@@ -9,6 +9,7 @@
 #include <QWidget>
 #include <QTableView>
 #include <QButtonGroup>
+#include <QListWidget>
 
 #include "buttons.h"
 #include "loaderbuttons.h"
@@ -27,10 +28,12 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+    bool eventFilter(QObject *obj, QEvent *event);
     void addLoadButtons();
     void addTestButtons();
     void linkEngine();
     void setDisplayTable(int button_id);
+    void createVehicleDatabase(QString vehicle_name);
 
 private slots:
     void on_pushButton_load_clicked();
@@ -40,6 +43,8 @@ private slots:
     void on_pushButton_simulate_clicked();
 
     void onGroupButtonClicked(int);
+
+    void on_pushButton_loadvehicledata_clicked();
 
 private:
     Ui::MainWindow *ui;
@@ -57,6 +62,7 @@ private:
     QTableView *general_table;
     QTableView *wheel_table;
     QTableView *list_table;
+    QListWidget *vehicle_list;
 
     //DataManager vehicle_data;
 };

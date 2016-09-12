@@ -5,7 +5,7 @@
 #define WHEEL_DATA  2
 #define LIST_DATA   4
 
-#define DEFAULT_VEHICLE_DATABASE  "D:/VisVehicle/defaultvehicles.db"
+#define DEFAULT_VEHICLE_DATABASE  "D:/codes/qt/VisVehicle/defaultvehicles.db"
 #define READ_BUTTON_LIST_PATH ":/new/lists/load_buttons_list"
 #define READ_TEST_CATEGORY_LIST_PATH ":/new/lists/test_category_list"
 

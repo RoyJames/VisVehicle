@@ -4,4 +4,8 @@
         <file>test_category_list</file>
         <file>defaultvehicles.db</file>
     </qresource>
+    <qresource prefix="/visual">
+        <file>style.qss</file>
+        <file>mainwindowbg.png</file>
+    </qresource>
 </RCC>

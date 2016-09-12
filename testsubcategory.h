@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <QBoxLayout>
+#include <QPushButton>
 
 class TestSubcategory
 {
@@ -17,6 +18,7 @@ public:
     QString DatabasePath;
     std::vector<QString> ResGraphNames;
     std::vector<QString> ResTableNames;
+    QPushButton *display_button;
 };
 
 #endif // TESTSUBCATEGORY_H

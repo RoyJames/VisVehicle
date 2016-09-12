@@ -1,0 +1,21 @@
+QPushButton {
+background-color:gray;
+color: white;
+border-radius: 10px;
+border: 2px groove gray;
+border-style: outset;
+}
+
+QPushButton:hover{
+background-color:white;
+color: black;
+}
+
+QPushButton:checked{
+background-color:orange;
+border-style: inset;
+}
+
+QLabel {
+color: white;
+}

@@ -9,6 +9,8 @@
 #include <QSqlTableModel>
 #include <QFile>
 #include <QButtonGroup>
+#include <QDir>
+#include <QFileDialog>
 #include "connection.h"
 
 #include "loaderbuttons.h"
@@ -26,23 +28,48 @@ MainWindow::MainWindow(QWidget *parent) :
     step_loadfiles = ui->page_load;
     step_conditions = ui->page_conditions;
     step_simulation = ui->page_simulation;
+    vehicle_list = ui->listWidget_vehiclelist;
 
-    addLoadButtons();
     general_table = NULL;
     wheel_table = NULL;
     list_table = NULL;
+
+    addLoadButtons();
     setDisplayTable(1);
 
     addTestButtons();
 
     //ui->horizontalLayout_test->addWidget(new GLWidget(this));
-    linkEngine();
+    //linkEngine();
 
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+bool MainWindow::eventFilter(QObject *obj, QEvent *event)
+{
+    // This function repeatedly call for those QObjects
+    // which have installed eventFilter (Step 2)
+
+    for (std::vector<TestCategory*>::size_type iter_main = 0;
+         iter_main != main_categories.size(); ++iter_main)
+    {
+        for (std::vector<TestSubcategory*>::size_type iter_sub = 0;
+             iter_sub != main_categories[iter_main]->subcats.size(); ++iter_sub)
+        {
+            //qDebug() << main_categories[iter_main]->subcats[iter_sub]->FullDescriptions;
+            if (obj == (QObject*)(main_categories[iter_main]->subcats[iter_sub]->display_button)){
+                if (event->type() == QEvent::Enter)
+                {
+                    ui->label_detaildescription->setText(main_categories[iter_main]->subcats[iter_sub]->FullDescriptions);
+                }
+                return QWidget::eventFilter(obj, event);
+            }
+        }
+    }
 }
 
 void MainWindow::addLoadButtons()
@@ -57,13 +84,22 @@ void MainWindow::addLoadButtons()
     QTextStream txtInput(&button_list);
     QString lineStr;
 
+    QFile file(":/visual/style.qss");
+    file.open(QFile::ReadOnly);
+    QByteArray loadbuttonstyle = file.readAll();
+    file.close();
+
     loader_buttons_group = new QButtonGroup;
+    loader_buttons_group->setExclusive(true);
     int buttons_cnt = 0;
     while(!txtInput.atEnd())
     {
         lineStr = txtInput.readLine();
         QStringList fields = lineStr.split(',');
         QPushButton *new_button = new QPushButton(fields.takeFirst());
+        new_button->setStyleSheet(loadbuttonstyle);
+        new_button->setCheckable(true);
+        if (buttons_cnt == 0) new_button->setChecked(true);
         new_button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         loader_buttons_group->addButton(new_button, ++buttons_cnt);
         loaderbuttons_layout->addWidget(new_button);
@@ -89,6 +125,15 @@ void MainWindow::addTestButtons()
         lineStr = txtInput.readLine();
         QStringList fields = lineStr.split(',');
         TestCategory *newCategory = new TestCategory(fields.takeFirst());
+        // Add a new horizontal layout to display this category
+        QVBoxLayout *CategoryLayout = new QVBoxLayout();
+        ui->horizontalLayout_testcategory->addLayout(CategoryLayout);
+        QLabel *CategoryLabel = new QLabel(newCategory->getName());
+        CategoryLabel->setAlignment(Qt::AlignHCenter);
+        CategoryLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        CategoryLayout->addWidget(CategoryLabel);
+        CategoryLayout->setSizeConstraint(QLayout::SetMinimumSize);
+
         int n_subcats = fields.takeFirst().toInt();
         while(n_subcats--)
         {
@@ -100,7 +145,7 @@ void MainWindow::addTestButtons()
             // Read subcategory name and descriptions
             newSubcategory->SubcategoryName = subfields.takeFirst();
             //int n_short = subfields.takeFirst().toInt();
-            newSubcategory->ShortDescriptions = subfields.takeFirst();
+            newSubcategory->ShortDescriptions = subfields.takeFirst().replace("\\n", "\n");
             newSubcategory->FullDescriptions = txtInput.readLine();
 
             // Read function name and database path
@@ -128,6 +173,15 @@ void MainWindow::addTestButtons()
 
             // Finish reading this subcategory
             newCategory->subcats.push_back(newSubcategory);
+
+            // Display this subcategory
+            QPushButton *newSubcategoryButton = new QPushButton(newSubcategory->SubcategoryName
+                                                                + "\n" + newSubcategory->ShortDescriptions);
+            newSubcategoryButton->setCheckable(true);
+            newSubcategoryButton->installEventFilter(this);
+            newSubcategoryButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+            CategoryLayout->addWidget(newSubcategoryButton);
+            newSubcategory->display_button = newSubcategoryButton;
         }
         // Finish reading this main category
         main_categories.push_back(newCategory);
@@ -159,7 +213,9 @@ void MainWindow::linkEngine()
     engPutVariable(matEngine, "mycell", cell_array_ptr);
     */
 
-
+    createVehicleDatabase("virtual_vehicle");
+    
+    /*
     mxArray *buffer;
     engEvalString(matEngine, "teststr=cell(2,1); teststr{1}=['winter',char(9),' is',char(9), 'coming']; teststr{2}=['winter',char(9),'is',char(9),'not',char(9), 'coming']");
     buffer = mxGetCell(engGetVariable(matEngine, "teststr"), 0);
@@ -170,6 +226,7 @@ void MainWindow::linkEngine()
     {
         qDebug() << strlist.takeFirst();
     }
+    */
 }
 
 void MainWindow::on_pushButton_load_clicked()
@@ -187,6 +244,40 @@ void MainWindow::on_pushButton_simulate_clicked()
 {
     task_stacks->setCurrentWidget(step_simulation);
 }
+
+void MainWindow::createVehicleDatabase(QString vehicle_name)
+{
+    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+
+    QString databasefilename = QDir::currentPath() + '/' + vehicle_name + "_database.db";
+    qDebug() << databasefilename;
+    db.setDatabaseName(databasefilename);
+    db.open();
+
+    engEvalString(matEngine, "addpath('D:\codes\qt\VisVehicle\core');");
+    engEvalString(matEngine, "output = INP2cstring();");
+    mxArray *whole_database = engGetVariable(matEngine, "output");
+    QSqlQuery query;
+    for (std::vector<LoaderButtons*>::size_type iter = 0;
+         iter != loader_buttons.size(); ++iter)
+    {
+        query.exec("create table " + loader_buttons[iter]->getTableName() + "(Contents varchar,Unit varchar,Number real)");
+        mxArray *current_category_cell = mxGetCell(whole_database, iter);
+        int nrow = mxGetM(current_category_cell);
+        for(int i = 0; i < nrow; i++)
+        {
+            QString buffer = mxArrayToString(mxGetCell(current_category_cell, i));
+            QStringList tmp = buffer.split('\t');
+            if (tmp.size() <= 1) return;
+            QString new_entry = "insert into " + loader_buttons[iter]->getTableName() + " values('" + tmp.takeLast() + "','" + tmp.takeLast() + "'," + tmp.takeLast() + ")";
+            qDebug()<<new_entry;
+            query.exec(new_entry);
+        }
+    }
+
+    db.close();
+}
+
 
 void MainWindow::onGroupButtonClicked(int id)
 {
@@ -285,4 +376,11 @@ void MainWindow::setDisplayTable(int button_id)
         connect(ui->pushButton_undo, SIGNAL(clicked()), list_model, SLOT(revertAll()));
     }
 
+}
+
+void MainWindow::on_pushButton_loadvehicledata_clicked()
+{
+    QString fileName = QFileDialog::getOpenFileName(this, tr("open a vehicle file"), " ",  tr("All file(*.*);;INP file(*.inp)"));
+    vehicle_list->addItem(fileName.split('/').takeLast());
+    qDebug() << fileName;
 }
