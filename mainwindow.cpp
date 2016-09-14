@@ -11,6 +11,9 @@
 #include <QButtonGroup>
 #include <QDir>
 #include <QFileDialog>
+#include <QTextDocument>
+#include <QPainter>
+#include <QTextOption>
 #include "connection.h"
 
 #include "loaderbuttons.h"
@@ -39,7 +42,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     addTestButtons();
 
-    //ui->horizontalLayout_test->addWidget(new GLWidget(this));
+    ui->verticalLayout_results->addWidget(new GLWidget(this));
     //linkEngine();
 
 }
@@ -130,7 +133,7 @@ void MainWindow::addTestButtons()
         ui->horizontalLayout_testcategory->addLayout(CategoryLayout);
         QLabel *CategoryLabel = new QLabel(newCategory->getName());
         CategoryLabel->setAlignment(Qt::AlignHCenter);
-        CategoryLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        CategoryLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
         CategoryLayout->addWidget(CategoryLabel);
         CategoryLayout->setSizeConstraint(QLayout::SetMinimumSize);
 
@@ -145,7 +148,7 @@ void MainWindow::addTestButtons()
             // Read subcategory name and descriptions
             newSubcategory->SubcategoryName = subfields.takeFirst();
             //int n_short = subfields.takeFirst().toInt();
-            newSubcategory->ShortDescriptions = subfields.takeFirst().replace("\\n", "\n");
+            newSubcategory->ShortDescriptions = subfields.takeFirst().replace("\\n", "<br />");
             newSubcategory->FullDescriptions = txtInput.readLine();
 
             // Read function name and database path
@@ -175,14 +178,33 @@ void MainWindow::addTestButtons()
             newCategory->subcats.push_back(newSubcategory);
 
             // Display this subcategory
-            QPushButton *newSubcategoryButton = new QPushButton(newSubcategory->SubcategoryName
-                                                                + "\n" + newSubcategory->ShortDescriptions);
+            //QPushButton *newSubcategoryButton = new QPushButton(newSubcategory->SubcategoryName
+            //                                                    + "\n" + newSubcategory->ShortDescriptions);
+            QPushButton *newSubcategoryButton = new QPushButton();
+            QTextDocument Text;
+            QTextOption textOp;
+            textOp.setWrapMode(QTextOption::WrapAnywhere);
+            textOp.setAlignment(Qt::AlignCenter);
+            Text.setDefaultTextOption(textOp);
+            Text.setHtml("<td align=\"center\"><font color=white>"+newSubcategory->SubcategoryName+"</font><br />" "<font color=yellow>"+newSubcategory->ShortDescriptions+"</font></td>");
+
+            QPixmap pixmap(Text.size().width(), Text.size().height());
+            pixmap.fill( Qt::transparent );
+            QPainter painter( &pixmap );
+            Text.drawContents(&painter, pixmap.rect());
+
+            QIcon ButtonIcon(pixmap);
+            newSubcategoryButton->setIcon(ButtonIcon);
+            newSubcategoryButton->setIconSize(pixmap.rect().size());
+
             newSubcategoryButton->setCheckable(true);
+
             newSubcategoryButton->installEventFilter(this);
-            newSubcategoryButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+            newSubcategoryButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
             CategoryLayout->addWidget(newSubcategoryButton);
-            newSubcategory->display_button = newSubcategoryButton;
+            newSubcategory->display_button = newSubcategoryButton;            
         }
+        CategoryLayout->addStretch(1);
         // Finish reading this main category
         main_categories.push_back(newCategory);
     }
@@ -213,8 +235,8 @@ void MainWindow::linkEngine()
     engPutVariable(matEngine, "mycell", cell_array_ptr);
     */
 
-    createVehicleDatabase("virtual_vehicle");
-    
+    //createVehicleDatabase("virtual_vehicle");
+    runSimulations();
     /*
     mxArray *buffer;
     engEvalString(matEngine, "teststr=cell(2,1); teststr{1}=['winter',char(9),' is',char(9), 'coming']; teststr{2}=['winter',char(9),'is',char(9),'not',char(9), 'coming']");
@@ -254,7 +276,7 @@ void MainWindow::createVehicleDatabase(QString vehicle_name)
     db.setDatabaseName(databasefilename);
     db.open();
 
-    engEvalString(matEngine, "addpath('D:\codes\qt\VisVehicle\core');");
+    engEvalString(matEngine, "addpath('D://codes//qt//VisVehicle//core');");
     engEvalString(matEngine, "output = INP2cstring();");
     mxArray *whole_database = engGetVariable(matEngine, "output");
     QSqlQuery query;
@@ -278,6 +300,22 @@ void MainWindow::createVehicleDatabase(QString vehicle_name)
     db.close();
 }
 
+void MainWindow::runSimulations()
+{
+    engEvalString(matEngine, "addpath('D://codes//qt//VisVehicle//core');");
+    engEvalString(matEngine, "output = simulate();");
+    mxArray *whole_database = engGetVariable(matEngine, "output");
+    mxArray *current_result_cell = mxGetCell(whole_database, 0);
+    int nrow = mxGetM(current_result_cell);
+    for (int i = 0; i < nrow; i++)
+    {
+        QString buffer = mxArrayToString(mxGetCell(current_result_cell, i));
+        QStringList tmp = buffer.split('\t');
+        while (!tmp.empty()){
+            qDebug() << tmp.takeFirst();
+        }
+    }
+}
 
 void MainWindow::onGroupButtonClicked(int id)
 {
@@ -382,5 +420,31 @@ void MainWindow::on_pushButton_loadvehicledata_clicked()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("open a vehicle file"), " ",  tr("All file(*.*);;INP file(*.inp)"));
     vehicle_list->addItem(fileName.split('/').takeLast());
-    qDebug() << fileName;
+    //qDebug() << fileName;
+}
+
+void MainWindow::on_pushButton_confirmtest_clicked()
+{
+    selected_tests.clear();
+    selected_vehicles.clear();
+    for (std::vector<TestCategory*>::size_type iter_main = 0;
+         iter_main != main_categories.size(); ++iter_main)
+    {
+        for (std::vector<TestSubcategory*>::size_type iter_sub = 0;
+             iter_sub != main_categories[iter_main]->subcats.size(); ++iter_sub)
+        {
+            if (main_categories[iter_main]->subcats[iter_sub]->display_button->property("checked").toBool())
+            {
+                selected_tests.push_back(main_categories[iter_main]->subcats[iter_sub]);
+                //qDebug() << main_categories[iter_main]->subcats[iter_sub]->SubcategoryName;
+            }
+        }
+    }
+
+    for (int i = 0; i < vehicle_list->count(); i++)
+    {
+        selected_vehicles.push_back(vehicle_list->item(i)->text());
+        //qDebug() << i << " of " << vehicle_list->count();
+        //qDebug() << selected_vehicles[i];
+    }
 }

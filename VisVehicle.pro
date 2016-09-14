@@ -35,7 +35,6 @@ INCLUDEPATH += $$quote(E:\matlab32bit\extern\include)
 
 LIBS += -L$$quote(E:\matlab32bit\extern\lib\win32\microsoft) -llibeng -llibmat -llibmx -llibmex
 
-
 FORMS    += mainwindow.ui
 
 RESOURCES += \

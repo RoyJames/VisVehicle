@@ -26,13 +26,21 @@ void GLWidget::paintGL()
     QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
     f->glClear(GL_COLOR_BUFFER_BIT);
 
-    GLfloat vVertices[] = {
-            0.0f, 0.5f, 0.0f,
-            -0.5f, -0.5f, 0.0f,
-            0.5f, -0.5f, 0.0f
-        };
-    f->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, vVertices);
-    f->glEnableVertexAttribArray(0);
-    f->glDrawArrays(GL_TRIANGLES, 0, 3);
+    GLfloat point[300];
+    for (int i = 0; i < 100; i++)
+    {
+        point[i*3] = (GLfloat)i / 100.0f - 0.5f;
+        point[i*3 + 1] = point[i*3] * point[i*3];
+        point[i*3 + 2] = 0;
+    }
 
+    const GLfloat gColors[] = {
+        1.0f,0.0f,0.0f, 1.0f,
+    };
+
+
+    f->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, point);
+    f->glEnableVertexAttribArray(0);    
+    //f->glLineWidth(2.0);
+    f->glDrawArrays(GL_LINE_STRIP, 0, 100);
 }

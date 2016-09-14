@@ -34,6 +34,7 @@ public:
     void linkEngine();
     void setDisplayTable(int button_id);
     void createVehicleDatabase(QString vehicle_name);
+    void runSimulations();
 
 private slots:
     void on_pushButton_load_clicked();
@@ -46,6 +47,8 @@ private slots:
 
     void on_pushButton_loadvehicledata_clicked();
 
+    void on_pushButton_confirmtest_clicked();
+
 private:
     Ui::MainWindow *ui;
     QVBoxLayout *loaderbuttons_layout;
@@ -54,6 +57,8 @@ private:
 
     std::vector<LoaderButtons*> loader_buttons;
     std::vector<TestCategory*> main_categories;
+    std::vector<TestSubcategory*> selected_tests;
+    std::vector<QString> selected_vehicles;
     QButtonGroup *loader_buttons_group;
     QStackedWidget *task_stacks;
     QWidget *step_loadfiles;
