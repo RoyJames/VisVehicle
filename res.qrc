@@ -8,4 +8,8 @@
         <file>style.qss</file>
         <file>mainwindowbg.png</file>
     </qresource>
+    <qresource prefix="/shaders">
+        <file>fshader.glsl</file>
+        <file>vshader.glsl</file>
+    </qresource>
 </RCC>
