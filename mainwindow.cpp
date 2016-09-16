@@ -42,7 +42,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     addTestButtons();
 
-    ui->verticalLayout_results->addWidget(new GLWidget(this));
+    GLWidget *mygl = new GLWidget(this);
+    //((QGLWidget*)mygl)->setAutoBufferSwap(false);
+    ui->verticalLayout_results->addWidget(mygl);
     //linkEngine();
 
 }

@@ -7,7 +7,7 @@
 #include <QBasicTimer>
 #include <QGLShaderProgram>
 
-class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions
+class GLWidget : public QGLWidget, protected QOpenGLFunctions
 {
 public:
     GLWidget(QWidget *parent = 0);
@@ -16,7 +16,6 @@ protected:
     void initializeGL();
     void resizeGL(int w, int h);
     void paintGL();
-    void paintEvent(QPaintEvent *e);
     void initShaders();
 
 private:

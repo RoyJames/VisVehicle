@@ -1,22 +1,20 @@
 #include "glwidget.h"
-#include <QOpenGLFunctions>
-#include <QGLFunctions>
 #include <QGLWidget>
-#include <QGLWidget>
-#include <QtOpenGL/QtOpenGL>
-#include <GL/glu.h>
-#include <GL/gl.h>
+//#include <QOpenGLFunctions>
+//#include <QGLFunctions>
+//#include <QtOpenGL/QtOpenGL>
+//#include <GL/glu.h>
+//#include <GL/gl.h>
 #include <locale.h>
 #include <QColor>
 #include <QBrush>
 
 
-GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent)
+GLWidget::GLWidget(QWidget *parent) : QGLWidget(parent)
 {
-
+    this->setAutoFillBackground( false );
+    setAutoBufferSwap(false);
 }
-
-
 
 void GLWidget::initializeGL()
 {
@@ -27,8 +25,10 @@ void GLWidget::initializeGL()
     // Enable depth buffer
     glEnable(GL_DEPTH_TEST);
 
+    glFrontFace( GL_CW );
+
     // Enable back face culling
-    glEnable(GL_CULL_FACE);
+    //glEnable(GL_CULL_FACE);
 
     // Use QBasicTimer because its faster than QTimer
     //timer.start(12, this);
@@ -80,15 +80,16 @@ void GLWidget::resizeGL(int w, int h)
 
 void GLWidget::paintGL()
 {
-    QPainter painter(this);
-    //painter.begin(this);
+    QPainter painter;
+    painter.begin(this);
     painter.beginNativePainting();
+    makeCurrent();
     glPushAttrib( GL_ALL_ATTRIB_BITS );
-
     // Clear color and depth buffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     program.bind();
+
     // Generate points data
     GLfloat point[300];
     for (int i = 0; i < 100; i++)
@@ -115,15 +116,16 @@ void GLWidget::paintGL()
     painter.setRenderHint(QPainter::Antialiasing,true);
     painter.setRenderHint(QPainter::TextAntialiasing, true);
     painter.setPen(Qt::white);
-    painter.drawText(60,30,"TEST STRING! WHAT'S WRONG WITH THE TEXT?");
+    painter.setPen(Qt::SolidLine);
+    //setFont( QFont( tr( "Aerial" ), 26 ) );
+    painter.drawText(60,130,tr("Test String! WHAT'S WRONG WITH THE TEXT?"));
+
     painter.setBrush(QBrush(Qt::red,Qt::SolidPattern));;
     painter.drawEllipse(60,30,10,30);
-    painter.drawRect(20,20,160,160);
+    painter.drawRect(20,20,10,10);
     painter.end();
-}
-
-void GLWidget::paintEvent(QPaintEvent *e)
-{
+    swapBuffers();
+    update();
 }
 
 
