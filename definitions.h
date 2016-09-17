@@ -16,4 +16,6 @@ enum DATATABLETYPE{
     LIST_TYPE = 4
 };
 
+
+
 #endif // DEFINITIONS_H

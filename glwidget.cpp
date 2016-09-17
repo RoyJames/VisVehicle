@@ -12,14 +12,43 @@
 
 GLWidget::GLWidget(QWidget *parent) : QGLWidget(parent)
 {
-    this->setAutoFillBackground( false );
-    setAutoBufferSwap(false);
+    this->setAutoFillBackground(false);
+    this->setAutoBufferSwap(false);
+}
+
+GLWidget::GLWidget(QWidget *parent, int n, int *offset, float *data_buffer,
+                   QString x_name, QString y_name, QString z_name,
+                   QString title) : QGLWidget(parent)
+{
+    this->setAutoFillBackground(false);
+    this->setAutoBufferSwap(false);
+
+    plot_data.n_of_curves = n;
+    plot_data.offset_curves = new int[n];
+    int tot = 0;
+    for (int i = 0; i < n; i++)
+    {
+        plot_data.offset_curves[i] = offset[i];
+        tot += offset[i];
+    }
+    tot *= 3;
+
+    plot_data.point_data = new float[tot];
+    for (int i = 0; i < tot; i++)
+    {
+        plot_data.point_data[i] = data_buffer[i];
+    }
+
+    plot_data.x_name = x_name;
+    plot_data.y_name = y_name;
+    plot_data.z_name = z_name;
+    plot_data.title = title;
 }
 
 void GLWidget::initializeGL()
 {
     initializeOpenGLFunctions();
-    glClearColor(0.2f,0.2f,0.2f,1.0f);
+    glClearColor(0.0f,0.0f,0.0f,1.0f);
     initShaders();
 
     // Enable depth buffer
@@ -91,38 +120,41 @@ void GLWidget::paintGL()
     program.bind();
 
     // Generate points data
-    GLfloat point[300];
+    /*float point[300];
     for (int i = 0; i < 100; i++)
     {
         point[i*3] = (GLfloat)i / 100.0f - 0.5f;
         point[i*3 + 1] = point[i*3] * point[i*3];
         point[i*3 + 2] = 0;
     }
+    */
     int vertexLocation = program.attributeLocation("a_position");
     program.enableAttributeArray(vertexLocation);
-    glVertexAttribPointer(vertexLocation, 3, GL_FLOAT, GL_FALSE, 0, point);
+    //glVertexAttribPointer(vertexLocation, 3, GL_FLOAT, GL_FALSE, 0, point);
+    glVertexAttribPointer(vertexLocation, 3, GL_FLOAT, GL_FALSE, 0, this->plot_data.point_data);
+
+    //qDebug() << "in excution:" << this->plot_data.offset_curves[0];
 
     GLfloat green[] = {0.0,1.0,0.0,1.0};
     program.setUniformValueArray("color", green, 1, 4);
-    glDrawArrays(GL_LINE_STRIP, 0, 50);
-    GLfloat red[] = {1.0,0.0,0.0,1.0};
-    program.setUniformValueArray("color", red, 1, 4);
-    glDrawArrays(GL_LINE_STRIP, 49, 51);
+    glDrawArrays(GL_LINE_STRIP, 0, this->plot_data.offset_curves[0]);
+
     program.disableAttributeArray(vertexLocation);
     program.release();
     glPopAttrib();
 
     painter.endNativePainting();
-    painter.setRenderHint(QPainter::Antialiasing,true);
+
+    painter.setRenderHint(QPainter::Antialiasing, true);
     painter.setRenderHint(QPainter::TextAntialiasing, true);
-    painter.setPen(Qt::white);
-    painter.setPen(Qt::SolidLine);
-    //setFont( QFont( tr( "Aerial" ), 26 ) );
-    painter.drawText(60,130,tr("Test String! WHAT'S WRONG WITH THE TEXT?"));
 
     painter.setBrush(QBrush(Qt::red,Qt::SolidPattern));;
     painter.drawEllipse(60,30,10,30);
     painter.drawRect(20,20,10,10);
+
+    painter.setPen(Qt::white);
+    painter.drawText(60,60,tr("Test String!"));
+
     painter.end();
     swapBuffers();
     update();

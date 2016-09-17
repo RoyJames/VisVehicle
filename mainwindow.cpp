@@ -42,9 +42,19 @@ MainWindow::MainWindow(QWidget *parent) :
 
     addTestButtons();
 
-    GLWidget *mygl = new GLWidget(this);
-    //((QGLWidget*)mygl)->setAutoBufferSwap(false);
-    ui->verticalLayout_results->addWidget(mygl);
+    QHBoxLayout *newbox = new QHBoxLayout();
+    ui->verticalLayout_results->addLayout(newbox);
+
+    float point[300];
+    for (int i = 0; i < 100; i++)
+    {
+        point[i*3] = (GLfloat)i / 100.0f - 0.5f;
+        point[i*3 + 1] = point[i*3] * point[i*3];
+        point[i*3 + 2] = 0;
+    }
+    int offset[] = {100};
+    newbox->addWidget(new GLWidget(this,1,offset,point));
+    newbox->addWidget(new GLWidget(this,1,offset,point));
     //linkEngine();
 
 }
