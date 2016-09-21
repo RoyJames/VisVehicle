@@ -38,7 +38,11 @@ MainWindow::MainWindow(QWidget *parent) :
     list_table = NULL;
 
     addLoadButtons();
+
+    linkEngine();
+
     setDisplayTable(1);
+
 
     addTestButtons();
 
@@ -55,7 +59,7 @@ MainWindow::MainWindow(QWidget *parent) :
     int offset[] = {100};
     newbox->addWidget(new GLWidget(this,1,offset,point));
     newbox->addWidget(new GLWidget(this,1,offset,point));
-    //linkEngine();
+
 
 }
 
@@ -247,20 +251,8 @@ void MainWindow::linkEngine()
     engPutVariable(matEngine, "mycell", cell_array_ptr);
     */
 
-    //createVehicleDatabase("virtual_vehicle");
-    runSimulations();
-    /*
-    mxArray *buffer;
-    engEvalString(matEngine, "teststr=cell(2,1); teststr{1}=['winter',char(9),' is',char(9), 'coming']; teststr{2}=['winter',char(9),'is',char(9),'not',char(9), 'coming']");
-    buffer = mxGetCell(engGetVariable(matEngine, "teststr"), 0);
-    QString str = mxArrayToString(buffer);
-    //qDebug() << str;
-    QStringList strlist = str.split('\t');
-    while (!strlist.empty())
-    {
-        qDebug() << strlist.takeFirst();
-    }
-    */
+    createVehicleDatabase("virtual_vehicle");
+    //runSimulations();
 }
 
 void MainWindow::on_pushButton_load_clicked()
@@ -288,24 +280,57 @@ void MainWindow::createVehicleDatabase(QString vehicle_name)
     db.setDatabaseName(databasefilename);
     db.open();
 
+
     engEvalString(matEngine, "addpath('D://codes//qt//VisVehicle//core');");
-    engEvalString(matEngine, "output = INP2cstring();");
+    engEvalString(matEngine, "output = INP2cstring('D://codes//qt//dataExchange','INP_ef.xlsx');");
     mxArray *whole_database = engGetVariable(matEngine, "output");
     QSqlQuery query;
+
     for (std::vector<LoaderButtons*>::size_type iter = 0;
          iter != loader_buttons.size(); ++iter)
     {
-        query.exec("create table " + loader_buttons[iter]->getTableName() + "(Contents varchar,Unit varchar,Number real)");
-        mxArray *current_category_cell = mxGetCell(whole_database, iter);
-        int nrow = mxGetM(current_category_cell);
-        for(int i = 0; i < nrow; i++)
+        if (loader_buttons[iter]->getDataFlag() & (GENERAL_TYPE | WHEEL_TYPE))
         {
-            QString buffer = mxArrayToString(mxGetCell(current_category_cell, i));
-            QStringList tmp = buffer.split('\t');
-            if (tmp.size() <= 1) return;
-            QString new_entry = "insert into " + loader_buttons[iter]->getTableName() + " values('" + tmp.takeLast() + "','" + tmp.takeLast() + "'," + tmp.takeLast() + ")";
-            qDebug()<<new_entry;
-            query.exec(new_entry);
+            query.exec("create table " + loader_buttons[iter]->getTableName()
+                       + "(Contents varchar,Unit varchar,Number real,FL real,FR real,RL real,RR real,flag varchar)");
+            mxArray *current_category_cell = mxGetCell(whole_database, iter);
+            int nrow = mxGetM(current_category_cell);
+            for(int i = 0; i < nrow; i++)
+            {
+                QString buffer = mxArrayToString(mxGetCell(current_category_cell, i));
+                QStringList tmp = buffer.split('\t');
+                if (tmp.size() <= 1) return;
+                QString new_entry;
+                if (tmp.size() == 3)    // GENERAL data has 3 entries
+                {
+                    new_entry = "insert into " + loader_buttons[iter]->getTableName() + " values('" +
+                            tmp.takeLast() + "','" + tmp.takeLast() + "'," + tmp.takeLast() + ",NULL,NULL,NULL,NULL,'GENERAL')";
+                }else if(tmp.size() == 6)   // WHEEL data has 6 entries
+                {
+                    new_entry = "insert into " + loader_buttons[iter]->getTableName() + " values('" +
+                            tmp.takeLast() + "','" + tmp.takeLast() + "',NULL," + tmp.takeLast() + "," + tmp.takeLast() + ","
+                             + tmp.takeLast() + "," + tmp.takeLast() + ",'WHEEL')";
+                }
+                qDebug() << new_entry;
+                query.exec(new_entry);
+            }
+        }else if (loader_buttons[iter]->getDataFlag() & LIST_TYPE)
+        {
+            query.exec("create table " + loader_buttons[iter]->getTableName()
+                       + "('Displacement - F(mm)' real,'Force - F(N)' real,'Displacement - R(mm)' real,'Force - R(N)' real,flag varchar)");
+            mxArray *current_category_cell = mxGetCell(whole_database, iter);
+            int nrow = mxGetM(current_category_cell);
+            for(int i = 0; i < nrow; i++)
+            {
+                QString buffer = mxArrayToString(mxGetCell(current_category_cell, i));
+                QStringList tmp = buffer.split('\t');
+                if (tmp.size() <= 1) return;
+                QString new_entry;
+                new_entry = "insert into " + loader_buttons[iter]->getTableName() + " values(" +
+                            tmp.takeLast() + "," + tmp.takeLast() + "," + tmp.takeLast() + "," + tmp.takeLast() + ",'LIST')";
+                qDebug() << new_entry;
+                query.exec(new_entry);
+            }
         }
     }
 
@@ -337,7 +362,8 @@ void MainWindow::onGroupButtonClicked(int id)
 
 void MainWindow::setDisplayTable(int button_id)
 {
-    static QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+    //QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+    QSqlDatabase db = QSqlDatabase::database();
 
     LoaderButtons *currentLoader = loader_buttons[button_id - 1];
     db.setDatabaseName(currentLoader->getDatabaseName());

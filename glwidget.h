@@ -18,6 +18,10 @@ typedef struct{
     QString y_name;
     QString z_name;
     QString title;
+    float xmin;
+    float ymin;
+    float xmax;
+    float ymax;
 }plotinfo;
 
 class GLWidget : public QGLWidget, protected QOpenGLFunctions
@@ -32,6 +36,8 @@ protected:
     void resizeGL(int w, int h);
     void paintGL();
     void initShaders();
+    void drawCoordinate(QPainter *painter);
+    void rescaleData();
 
 private:
     QBasicTimer timer;
