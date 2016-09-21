@@ -15,9 +15,11 @@ enum DATATABLETYPE{
     LIST_TYPE = 4
 };
 
-#define COORD_BOTTOM_X 0.9
+// TOP is the left top corner, BOTTOM is the right bottom corner of the rectangle
+#define COORD_BOTTOM_X 0.95
 #define COORD_BOTTOM_Y 0.9
-#define COORD_TOP_X 0.1
+#define COORD_TOP_X 0.2
 #define COORD_TOP_Y 0.1
+#define COORD_TICK_SPACE 4
 
 #endif // DEFINITIONS_H

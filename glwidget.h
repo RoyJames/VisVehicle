@@ -12,8 +12,8 @@ typedef struct{
     float *point_data;
     int n_of_curves;
     int *offset_curves;
-    int x_interval = 10;
-    int y_interval = 10;
+    int x_interval = 6;
+    int y_interval = 6;
     QString x_name;
     QString y_name;
     QString z_name;

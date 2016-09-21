@@ -68,7 +68,7 @@ GLWidget::GLWidget(QWidget *parent, int n, int *offset, float *data_buffer,
 void GLWidget::initializeGL()
 {
     initializeOpenGLFunctions();
-    glClearColor(0.0f,0.0f,0.0f,1.0f);
+    glClearColor(1.0f,1.0f,1.0f,1.0f);
     initShaders();
 
     // Enable depth buffer
@@ -133,23 +133,56 @@ void GLWidget::drawCoordinate(QPainter *painter)
     int h = painter->window().height();
     QFontMetrics metrics = painter->fontMetrics();
     int textHeight = metrics.ascent() + metrics.descent();
-    float deltaX = (float)w / plot_data.x_interval;
+    float deltaX = (float)w * (COORD_BOTTOM_X - COORD_TOP_X) / plot_data.x_interval;
+    float deltaY = (float)h * (COORD_BOTTOM_Y - COORD_TOP_Y) / plot_data.x_interval;
+
 
     // draw bounding box
     painter->drawRect(w * COORD_TOP_X, h * COORD_TOP_Y,
                        w * (COORD_BOTTOM_X - COORD_TOP_X), h * (COORD_BOTTOM_Y - COORD_TOP_Y));
 
-    // draw horizontal ticks
-    for (int i = 1; i <= plot_data.x_interval; i++) {
-        QString tick = QString("%1").arg(plot_data.xmin + (plot_data.xmax - plot_data.xmin) * i / plot_data.x_interval);
+    // draw horizontal ticks and grid lines
+    for (int i = 0; i <= plot_data.x_interval; i++) {
+        QString tick = QString("%1").arg(plot_data.xmin + (plot_data.xmax - plot_data.xmin) * i / plot_data.x_interval, 0, 'g', 2);
         int stringWidth = metrics.width(tick);
-        painter->drawLine(w * COORD_TOP_X + deltaX * i, h * COORD_BOTTOM_Y, w * COORD_TOP_X + deltaX * i, h * COORD_BOTTOM_Y + 4);
-        int monthX = deltaX * (i - 1) + ((deltaX - stringWidth) / 2);
-        painter->drawText(monthX, h * COORD_BOTTOM_Y + textHeight, tick);
+        painter->drawLine(w * COORD_TOP_X + deltaX * i, h * COORD_BOTTOM_Y, w * COORD_TOP_X + deltaX * i, h * COORD_BOTTOM_Y + COORD_TICK_SPACE);
+        int monthX = deltaX * i - stringWidth / 2;
+        painter->drawText(w * COORD_TOP_X + monthX, h * COORD_BOTTOM_Y + textHeight + COORD_TICK_SPACE, tick);
+
+        painter->setPen(Qt::DashLine);
+        painter->drawLine(w * COORD_TOP_X + deltaX * i, h * COORD_BOTTOM_Y, w * COORD_TOP_X + deltaX * i, h * COORD_TOP_Y);
+        painter->setPen(Qt::SolidLine);
     }
+    // draw horizontal title
+    int xTitleWidth = metrics.width(plot_data.x_name);
+    painter->drawText(w * COORD_TOP_X + w * (COORD_BOTTOM_X - COORD_TOP_X) / 2 - xTitleWidth / 2,
+                      h * COORD_BOTTOM_Y + textHeight * 2 + COORD_TICK_SPACE, plot_data.x_name);
 
+    int maxstringWidth = 0;
+    // draw vertical ticks and grid lines
+    for (int i = 0; i <= plot_data.y_interval; i++) {
+        QString tick = QString("%1").arg(plot_data.ymin + (plot_data.ymax - plot_data.ymin) * i / plot_data.y_interval, 0, 'g', 2);
+        int stringWidth = metrics.width(tick);
+        maxstringWidth = maxstringWidth > stringWidth ? maxstringWidth : stringWidth;
+        painter->drawLine(w * COORD_TOP_X, h * COORD_BOTTOM_Y - deltaY * i, w * COORD_TOP_X - COORD_TICK_SPACE , h * COORD_BOTTOM_Y - deltaY * i);
+        //int monthX = deltaY * i - stringWidth / 2;
+        painter->drawText(w * COORD_TOP_X - stringWidth - COORD_TICK_SPACE, h * COORD_BOTTOM_Y - deltaY * i + textHeight / 2, tick);
 
-    // draw vertical ticks
+        painter->setPen(Qt::DashLine);
+        painter->drawLine(w * COORD_TOP_X, h * COORD_BOTTOM_Y - deltaY * i, w * COORD_BOTTOM_X , h * COORD_BOTTOM_Y - deltaY * i);
+        painter->setPen(Qt::SolidLine);
+    }
+    // draw vertical title
+    int yTitleWidth = metrics.width(plot_data.y_name);
+    painter->save();
+    painter->rotate(-90);
+    painter->drawText(-(h * COORD_BOTTOM_Y - h * (COORD_BOTTOM_Y - COORD_TOP_Y) / 2 + yTitleWidth / 2),
+                      w * COORD_TOP_X - maxstringWidth - COORD_TICK_SPACE - textHeight / 2, plot_data.y_name);
+    painter->restore();
+
+    // draw top title
+    int topTitleWidth = metrics.width(plot_data.title);
+    painter->drawText(w * COORD_TOP_X + w * (COORD_BOTTOM_X - COORD_TOP_X) / 2 - topTitleWidth / 2, h * COORD_TOP_Y - textHeight / 2, plot_data.title);
 }
 
 void GLWidget::rescaleData()
@@ -201,8 +234,6 @@ void GLWidget::paintGL()
 
     painter->setRenderHint(QPainter::Antialiasing, true);
     painter->setRenderHint(QPainter::TextAntialiasing, true);
-    painter->setPen(Qt::white);
-    //painter->drawText(60,60,tr("Test String!"));
     drawCoordinate(painter);
 
     painter->end();

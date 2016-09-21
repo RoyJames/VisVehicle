@@ -34,6 +34,7 @@ public:
     void linkEngine();
     void setDisplayTable(int button_id);
     void createVehicleDatabase(QString vehicle_name);
+    void saveVehicleDatabase(QString vehicle_name);
     void runSimulations();
 
 private slots:

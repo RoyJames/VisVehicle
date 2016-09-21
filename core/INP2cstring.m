@@ -44,7 +44,7 @@ steering_sheet = cell(10,1);
         ,char(9),num2str(Weight_r1),char(9),num2str(Weight_l2),char(9),...
         num2str(Weight_r2)];
     
-    % Unsprung camber moment of inertia, kg-m^2
+    % Unsprung camber moment of , kg-m^2
     Jus_x_l1= NUM5(3,1); Jus_x_txt = [TXT5{3,1},char(9),TXT5{3,2}];
     Jus_x_r1= NUM5(3,2);
     Jus_x_l2= NUM5(3,3);

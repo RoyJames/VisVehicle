@@ -39,7 +39,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     addLoadButtons();
 
-    linkEngine();
+    //linkEngine();
 
     setDisplayTable(1);
 
@@ -57,7 +57,7 @@ MainWindow::MainWindow(QWidget *parent) :
         point[i*3 + 2] = 0;
     }
     int offset[] = {100};
-    newbox->addWidget(new GLWidget(this,1,offset,point));
+    newbox->addWidget(new GLWidget(this,1,offset,point,"Lateral g [g]","Understeer Gradient [deg/g]","","HANDLING - SSC"));
     newbox->addWidget(new GLWidget(this,1,offset,point));
 
 
@@ -271,15 +271,22 @@ void MainWindow::on_pushButton_simulate_clicked()
     task_stacks->setCurrentWidget(step_simulation);
 }
 
+void MainWindow::saveVehicleDatabase(QString vehicle_name)
+{
+
+}
+
+
 void MainWindow::createVehicleDatabase(QString vehicle_name)
 {
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
 
     QString databasefilename = QDir::currentPath() + '/' + vehicle_name + "_database.db";
     qDebug() << databasefilename;
+    QFile::remove(databasefilename);
+
     db.setDatabaseName(databasefilename);
     db.open();
-
 
     engEvalString(matEngine, "addpath('D://codes//qt//VisVehicle//core');");
     engEvalString(matEngine, "output = INP2cstring('D://codes//qt//dataExchange','INP_ef.xlsx');");
@@ -289,6 +296,7 @@ void MainWindow::createVehicleDatabase(QString vehicle_name)
     for (std::vector<LoaderButtons*>::size_type iter = 0;
          iter != loader_buttons.size(); ++iter)
     {
+        loader_buttons[iter]->setDatabaseName(databasefilename);
         if (loader_buttons[iter]->getDataFlag() & (GENERAL_TYPE | WHEEL_TYPE))
         {
             query.exec("create table " + loader_buttons[iter]->getTableName()
